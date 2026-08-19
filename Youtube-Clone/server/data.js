@@ -1,4 +1,10 @@
-let videos = [
+const fs = require('fs')
+const path = require('path')
+
+const file = path.join(__dirname, 'videos.json')
+
+// default seed data
+const seed = [
   {
     id: '1',
     title: 'Flower (sample video)',
@@ -18,8 +24,7 @@ let videos = [
     thumbnail: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
     likes: 7,
     comments: []
-  }
-  ,
+  },
   {
     id: '3',
     title: 'Elephants Dream',
@@ -74,6 +79,25 @@ let videos = [
     likes: 6,
     comments: []
   }
-];
+]
 
-module.exports = { videos };
+let videos = seed
+try {
+  if (fs.existsSync(file)) {
+    const raw = fs.readFileSync(file, 'utf8')
+    const parsed = JSON.parse(raw || 'null')
+    if (Array.isArray(parsed)) videos = parsed
+  }
+} catch (err) {
+  console.error('Failed to load videos.json', err.message)
+}
+
+function saveVideos() {
+  try {
+    fs.writeFileSync(file, JSON.stringify(videos, null, 2))
+  } catch (err) {
+    console.error('Failed to save videos.json', err.message)
+  }
+}
+
+module.exports = { videos, saveVideos }

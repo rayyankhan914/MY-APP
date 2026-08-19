@@ -1,0 +1,92 @@
+[
+  {
+    "id": "u1786878046507",
+    "username": "dbg_user",
+    "password": "$2a$08$7IML7vtdsgy5z4yE/tbli.p2URcPeKjYBcy3dhgs0SDT/LjE9.xTC"
+  },
+  {
+    "id": "u1786878238078",
+    "username": "vuser",
+    "password": "$2a$08$8C4El.I6U8KBd.Oz8gnWpOdLV9HZ1dP8gf9dH6WvF0S6jKusvhQsm"
+  },
+  {
+    "id": "u1786879728848",
+    "username": "persist_e2e",
+    "password": "$2a$08$nYdqacyu7qYxH3kDeXaFcOB2WxwhZOFAXPmT1HKcj04AlGxGlGh6K"
+  },
+  {
+    "id": "u1786880194856",
+    "username": "img_user",
+    "password": "$2a$08$GqW6VsxuTCAQNg73CRTUqOSeFLCrkruQszxlbcoeVc5lHdPEjxkoK",
+    "avatar": "/uploads/avatars/1786882662512-903968234.png",
+    "cover": "/uploads/covers/1786882662514-9337006.png"
+  },
+  {
+    "id": "u1786876805265",
+    "username": "userone",
+    "about": "",
+    "avatar": "/uploads/avatars/1786880598767-473427922.jpeg-128.jpg",
+    "cover": "/uploads/covers/1786880598782-973566796.png-1200x300.jpg"
+  },
+  {
+    "id": "u1786880346067",
+    "username": "upload_test",
+    "password": "$2a$08$j3u.3IStKN959Vb4/OEJseMb4A.hYw1i8Z0tpU0o1uRpk.xld9kTm"
+  },
+  {
+    "id": "u1786880389823",
+    "username": "upload_test_simple2",
+    "password": "$2a$08$1R6KFrpNN7Cl6C.mh6k4mO.BPoI0ybhmpvoZm4uQACwO.8qV.P1a2"
+  },
+  {
+    "id": "u1786880456356",
+    "username": "upload_test_clean2",
+    "password": "$2a$08$Gj4J1FiGDMZ1GVoRIcb8duG2pBvAzBDV9YeLAyJ/1kotGmoeG.5sG"
+  },
+  {
+    "id": "u1786880529228",
+    "username": "upload_test_final2",
+    "password": "$2a$08$j2i515bEPnGSU1Bim8sFE.gXRz3LCzirgN.v0ywQ.mzAbkWK2IhAG"
+  },
+  {
+    "id": "u1786880695502",
+    "username": "upload_png_test",
+    "password": "$2a$08$x.V4bCiNiXHpn/O964fogudfmlxyL/9rFaNyNDJ43oDgGdq8VAKq6"
+  },
+  {
+    "id": "u1786880712862",
+    "username": "upload_simple",
+    "password": "$2a$08$tdcEFCuHE4colPXa8ifGD.d9dihABx3FP3GkuByY2IrQ9KBHSVzPW"
+  },
+  {
+    "id": "u1786794500836",
+    "username": "1122334",
+    "about": "",
+    "avatar": "/uploads/avatars/1786882703126-229104542.jpeg-128.jpg"
+  },
+  {
+    "id": "u1787135928242",
+    "username": "'testuser1787135928'",
+    "password": "$2a$08$U9RHtVc1ac3fY0FDrKmckOQspdF7hJgbIIOTxoUd7kgGyQdlvIy2q"
+  },
+  {
+    "id": "u1787135940708",
+    "username": "testu21787135940",
+    "password": "$2a$08$aenZEsrYQI/EMvptC8H70urqw7eBiovnvvrjRGo5L5efyKb2QqDkm"
+  },
+  {
+    "id": "u1787135959108",
+    "username": "testu31787135959",
+    "password": "$2a$08$I5e3gEDkMH54kf7ZBS0aretc6BoU0intwSF8GqoUH3KTg2JXSmlzS"
+  },
+  {
+    "id": "u1787135987646",
+    "username": "testscript1787135987",
+    "password": "$2a$08$ClyXMWDEtuLJroGw.JRQPuygaJWmCi9dML903bKDA17NjfX8Vcs9q"
+  },
+  {
+    "id": "u1787136030161",
+    "username": "testsuite1787136030",
+    "password": "$2a$08$4shRNLbO/YuLY2Oo2zfiSuMLWXdAVZFixTJ01cCv1j6k0Zbd6JTWa"
+  }
+]

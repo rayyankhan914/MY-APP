@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { videos } = require('../data');
+const jwt = require('jsonwebtoken')
+const secret = process.env.JWT_SECRET || 'devsecret'
+const { users } = require('../users')
 const auth = require('../middleware/auth')
 const multer = require('multer')
 const path = require('path')
 const fs = require('fs')
+let sharp
+try { sharp = require('sharp') } catch (e) { console.warn('sharp not available, thumbnail resizing disabled') }
 
 // storage setup
 const storage = multer.diskStorage({
@@ -39,9 +44,10 @@ router.get('/:id', (req, res) => {
 router.post('/', auth, (req, res) => {
   const { title, description, url, thumbnail } = req.body;
   if (!title || !url) return res.status(400).json({ error: 'title and url required' });
-  const id = String(Date.now());
+  const id = String(Date.now())
   const video = { id, title, description: description || '', url, thumbnail: thumbnail || '', likes: 0, comments: [], ownerId: req.user && req.user.id ? req.user.id : null };
   videos.unshift(video);
+  try { const { saveVideos } = require('../data'); saveVideos() } catch (e) { console.error('saveVideos failed', e && e.message) }
   res.status(201).json(video);
 });
 
@@ -70,11 +76,48 @@ router.post('/upload', auth, upload.fields([{ name: 'video', maxCount: 1 }, { na
       fs.writeFileSync(path.join(thumbsFolder, thumbFilename), svg)
     }
 
-    const thumbnailUrl = `/uploads/thumbs/${thumbFilename}`
+    // create resized variants if sharp is available
+    const originalThumbPath = path.join(thumbsFolder, thumbFilename)
+    let chosenThumb = thumbFilename
+    if (sharp && fs.existsSync(originalThumbPath)) {
+      try {
+        // detect if SVG content to avoid unsupported format errors
+        let isSvgThumb = false
+        try {
+          const sampleT = fs.readFileSync(originalThumbPath, { encoding: 'utf8', flag: 'r' }).slice(0, 512)
+          if (sampleT && sampleT.toLowerCase().includes('<svg')) isSvgThumb = true
+        } catch (e) {
+          isSvgThumb = false
+        }
+        if (!isSvgThumb) {
+          const small = videoFile.filename + '-thumb-320.jpg'
+          const medium = videoFile.filename + '-thumb-640.jpg'
+          await sharp(originalThumbPath).resize(320, 180).jpeg({ quality: 75 }).toFile(path.join(thumbsFolder, small))
+          await sharp(originalThumbPath).resize(640, 360).jpeg({ quality: 80 }).toFile(path.join(thumbsFolder, medium))
+          chosenThumb = small
+        } else {
+          // if original is SVG, try to rasterize into JPEG thumbnails
+          try {
+            const small = videoFile.filename + '-thumb-320.jpg'
+            const medium = videoFile.filename + '-thumb-640.jpg'
+            await sharp(originalThumbPath).jpeg({ quality: 75 }).resize(320, 180).toFile(path.join(thumbsFolder, small))
+            await sharp(originalThumbPath).jpeg({ quality: 80 }).resize(640, 360).toFile(path.join(thumbsFolder, medium))
+            chosenThumb = small
+          } catch (err) {
+            console.error('svg thumbnail conversion failed', err && err.message)
+          }
+        }
+      } catch (err) {
+        console.error('thumbnail resize failed', err && err.message)
+      }
+    }
+
+    const thumbnailUrl = `/uploads/thumbs/${chosenThumb}`
     const { title, description } = req.body
     const id = String(Date.now())
     const video = { id, title: title || 'Untitled', description: description || '', url: videoUrl, thumbnail: thumbnailUrl, likes: 0, comments: [], ownerId: req.user && req.user.id ? req.user.id : null }
     videos.unshift(video)
+    try { const { saveVideos } = require('../data'); saveVideos() } catch (e) { console.error('saveVideos failed', e && e.message) }
     res.status(201).json(video)
   } catch (err) {
     console.error(err)
@@ -89,5 +132,35 @@ router.post('/:id/like', auth, (req, res) => {
   v.likes = (v.likes || 0) + 1;
   res.json({ likes: v.likes });
 });
+
+// record a view (increments view count; if authenticated, append to user history)
+router.post('/:id/view', async (req, res) => {
+  const v = videos.find((x) => x.id === req.params.id);
+  if (!v) return res.status(404).json({ error: 'Not found' });
+  v.views = (v.views || 0) + 1
+  try { const { saveVideos } = require('../data'); saveVideos() } catch (e) { console.error('saveVideos failed', e && e.message) }
+
+  const h = req.headers.authorization || ''
+  if (h.startsWith('Bearer ')) {
+    const token = h.slice(7)
+    try {
+      const payload = jwt.verify(token, secret)
+      const user = users.find((u) => u.id === payload.id)
+      if (user) {
+        user.history = user.history || []
+        // remove existing entry for this video to avoid duplicates
+        const existing = user.history.findIndex((h) => h.videoId === v.id)
+        if (existing !== -1) user.history.splice(existing, 1)
+        user.history.unshift({ videoId: v.id, watchedAt: Date.now() })
+        if (user.history.length > 200) user.history.length = 200
+        try { const { saveUsers } = require('../users'); saveUsers() } catch (e) { console.error('saveUsers failed', e && e.message) }
+      }
+    } catch (err) {
+      // ignore invalid token for view tracking
+    }
+  }
+
+  res.json({ views: v.views })
+})
 
 module.exports = router;

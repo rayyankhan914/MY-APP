@@ -9,6 +9,9 @@ import Profile from './pages/Profile'
 import { setAuthToken } from './api'
 import { SearchProvider, useSearch } from './search/SearchContext'
 import TopProgress from './components/TopProgress'
+import Footer from './components/Footer'
+import Sidebar from './components/Sidebar'
+import History from './pages/History'
 
 export default function App() {
   const navigate = useNavigate()
@@ -96,16 +99,21 @@ function InnerApp({ token, navigate }) {
         </div>
       </header>
 
-      <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/watch/:id" element={<Watch />} />
-          <Route path="/upload" element={<Upload />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-      </main>
+      <div className="layout">
+        <Sidebar />
+        <main className="main-area">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/watch/:id" element={<Watch />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/history" element={<History />} />
+          </Routes>
+        </main>
+      </div>
+      <Footer />
     </div>
   )
 }

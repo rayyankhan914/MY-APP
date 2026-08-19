@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchVideo, likeVideo, fetchComments, postComment } from '../api'
+import { fetchVideo, likeVideo, fetchComments, postComment, default as api } from '../api'
 
 export default function Watch() {
   const { id } = useParams()
@@ -9,9 +9,21 @@ export default function Watch() {
   const [text, setText] = useState('')
 
   useEffect(() => {
-    fetchVideo(id).then(setVideo).catch(() => setVideo(null))
+    fetchVideo(id).then((v) => { setVideo(v) }).catch(() => setVideo(null))
     fetchComments(id).then(setComments).catch(()=>setComments([]))
   }, [id])
+
+  const [viewRecorded, setViewRecorded] = React.useState(false)
+
+  async function recordView() {
+    if (viewRecorded) return
+    setViewRecorded(true)
+    try {
+      await api.post(`/videos/${id}/view`)
+    } catch (err) {
+      // ignore
+    }
+  }
 
   if (!video) return <div className="container">Video not found</div>
 
@@ -33,7 +45,7 @@ export default function Watch() {
   return (
     <div className="container">
       <h2>{video.title}</h2>
-      <video controls className="player">
+      <video controls className="player" onPlay={recordView}>
         <source src={video.url} type="video/mp4" />
       </video>
       <div style={{display:'flex',gap:12,alignItems:'center',marginTop:8}}>

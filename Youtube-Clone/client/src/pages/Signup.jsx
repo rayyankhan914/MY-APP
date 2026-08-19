@@ -5,6 +5,7 @@ import api, { setAuthToken } from '../api'
 export default function Signup() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [debug, setDebug] = useState(null)
   const navigate = useNavigate()
 
   async function submit(e) {
@@ -16,7 +17,14 @@ export default function Signup() {
       setAuthToken(token)
       navigate('/')
     } catch (err) {
-      alert(err.response?.data?.error || 'Registration failed')
+      // show detailed error so it's easier to diagnose client/server failures
+      console.error('Signup error:', err)
+      const serverMsg = err?.response?.data?.error
+      const status = err?.response?.status
+      // capture full response for debug UI
+      setDebug(err?.response?.data || { message: err.message, status })
+      const msg = serverMsg || err?.message || 'Registration failed'
+      alert(msg + (status ? ` (status ${status})` : ''))
     }
   }
 
@@ -28,6 +36,11 @@ export default function Signup() {
         <label>Password<input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} /></label>
         <button type="submit">Create account</button>
       </form>
+      {debug && (
+        <pre style={{ background: '#111', color: '#fff', padding: 8, marginTop: 12, maxHeight: 240, overflow: 'auto' }}>
+          {JSON.stringify(debug, null, 2)}
+        </pre>
+      )}
     </div>
   )
 }

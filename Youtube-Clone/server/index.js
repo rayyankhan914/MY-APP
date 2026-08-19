@@ -6,13 +6,24 @@ const videos = require('./routes/videos');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+// parse JSON safely: catch body-parser errors and return 400 instead of crashing
+app.use((req, res, next) => {
+	express.json()(req, res, (err) => {
+		if (err) {
+			console.error('JSON parse error:', err && err.message)
+			return res.status(400).json({ error: 'Invalid JSON' })
+		}
+		next()
+	})
+})
 
 // ensure uploads folders exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const videosDir = path.join(uploadsDir, 'videos');
 const thumbsDir = path.join(uploadsDir, 'thumbs');
-[uploadsDir, videosDir, thumbsDir].forEach((d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }) });
+const avatarsDir = path.join(uploadsDir, 'avatars');
+const coversDir = path.join(uploadsDir, 'covers');
+[uploadsDir, videosDir, thumbsDir, avatarsDir, coversDir].forEach((d) => { if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }) });
 
 // serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

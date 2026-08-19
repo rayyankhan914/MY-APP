@@ -8,11 +8,13 @@ const secret = process.env.JWT_SECRET || 'devsecret'
 
 router.post('/register', async (req, res) => {
   const { username, password } = req.body
+  console.log('[auth] register request', { username: username ? String(username).slice(0,50) : username })
   if (!username || !password) return res.status(400).json({ error: 'username and password required' })
   if (users.find((u) => u.username === username)) return res.status(400).json({ error: 'username taken' })
   const hash = bcrypt.hashSync(password, 8)
   const user = { id: 'u' + Date.now(), username, password: hash }
   users.push(user)
+  try { const { saveUsers } = require('../users'); saveUsers() } catch (e) { console.error('saveUsers failed', e && e.message) }
   const token = jwt.sign({ id: user.id, username: user.username }, secret, { expiresIn: '7d' })
   res.json({ token, user: { id: user.id, username: user.username } })
 })
